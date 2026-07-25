@@ -2,118 +2,49 @@
 
 Turn a text prompt into a live, editable Next.js application — instantly.
 
-Echo uses Gemini AI to generate full-stack code, runs it in an isolated E2B sandbox, and streams a live preview back to you. Iterate with follow-up prompts until it's exactly what you want.
-
-## Demo
 ![Demo Screenshot](./public/demo.png)
 
----
+## Stack
 
-## Features
-
-- Prompt → live website in seconds
-- Live preview with hot reload via E2B sandboxes
-- File tree explorer with syntax highlighting
-- Follow-up prompts for iterative refinement
-- Persistent projects and message history
-- GitHub OAuth + email/password authentication
-
----
-
-## Tech Stack
-
-| Layer | Technology |
+| Layer | |
 |---|---|
 | Framework | Next.js 15 (App Router) |
-| Language | TypeScript |
 | Styling | Tailwind CSS v4, shadcn/ui |
-| API | tRPC v11 |
-| ORM | Drizzle ORM |
-| Database | PostgreSQL (via `postgres` driver) |
-| Auth | Better Auth |
-| Background Jobs | Inngest |
-| AI | Gemini 2.0 Flash (via `@inngest/agent-kit`) |
+| API | tRPC v11 + TanStack React Query |
+| ORM | Prisma + PostgreSQL |
+| Auth | Clerk |
+| AI | Gemini 2.0 Flash (`@inngest/agent-kit`) |
 | Sandboxes | E2B Code Interpreter |
-| State | TanStack Query v5 |
+| Jobs | Inngest |
 
----
+## Quick Start
 
-## Getting Started
-
-**Prerequisites:** Node.js 18+, Bun, PostgreSQL, E2B account, Google AI API key
 ```bash
 git clone https://github.com/acegikmoo/echo.git
 cd echo
 bun install
-bun db:push
-bun dev
+docker compose up -d          # PostgreSQL
+bun db:push                   # push schema
+bun dev                       # next.js
+npx inngest-cli@latest dev    # worker (separate terminal)
 ```
 
-For background jobs, run the Inngest dev server in a separate terminal:
-```bash
-npx inngest-cli@latest dev
+Copy `.env.example` to `.env` and fill in your keys (Clerk, Gemini, E2B).
+
+## Structure
+
+```
+app/          pages + API routes
+components/  React components + shadcn/ui
+trpc/         tRPC routers
+lib/          Prisma client, utils
+src/inngest/  AI agent, tools, prompt
+prisma/       schema
 ```
 
----
+## Deploy
 
-## Environment Variables
-
-Copy `.env.example` to `.env` and fill in the values:
-```env
-BETTER_AUTH_SECRET=           
-BETTER_AUTH_GITHUB_CLIENT_ID=
-BETTER_AUTH_GITHUB_CLIENT_SECRET=
-BETTER_AUTH_URL=http://localhost:3000
-
-DATABASE_URL=postgresql://postgres:password@localhost:5432/echo
-
-E2B_API_KEY=
-GOOGLE_API_KEY=
-```
-
----
-
-## Project Structure
-```
-src/
-├── app/
-│   ├── (auth)/          # Sign-in, sign-up
-│   ├── (main)/          # Dashboard, project view
-│   └── api/             # tRPC, Inngest, Auth handlers
-├── components/
-│   ├── ui/              # shadcn/ui primitives
-│   ├── fragments/       # Live preview, file explorer
-│   ├── messages/        # Chat UI
-│   └── project/         # Project form and layout
-└── server/
-    ├── api/             # tRPC routers
-    ├── better-auth/     # Auth config
-    ├── db/              # Drizzle schema and client
-    └── inngest/         # AI agent, tools, system prompt
-```
-
----
-
-## Deployment
-
-Designed for **Vercel** + a managed PostgreSQL provider (Neon, Supabase).
-
-1. Set all environment variables in your Vercel project
-2. Update the GitHub OAuth redirect URI to your production domain
-3. Connect your production database and Inngest account
-4. Deploy
-
----
-
-## Roadmap
-
-- Export project as ZIP
-- One-click deploy to Vercel
-- Version history per project
-- Team collaboration
-- Usage limits and billing
-
----
+Vercel + managed PostgreSQL (Neon/Supabase). Set env vars, connect Clerk + Inngest production instances.
 
 ## License
 

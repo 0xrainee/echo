@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Message {
+  id        String      @id @default(uuid())
+  content   String
+  role      MessageRole
+  type      Type
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  fragment  Fragment?
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+enum Type {
+  RESULT
+  ERROR
+}
+
+model Fragment {
+  id         String   @id @default(uuid())
+  messageId  String   @unique
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  sandboxUrl String
+  title      String
+  files      Json
+}
+
+model Project {
+  id        String    @id @default(uuid())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  userId    String
+  messages  Message[]
+}
